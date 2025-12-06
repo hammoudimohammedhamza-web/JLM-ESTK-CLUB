@@ -6,7 +6,7 @@ import { Pricing } from "@/components/pricing"
 import { AppverseFooter } from "@/components/appverse-footer"
 import Script from "next/script"
 
-// ✅ Force static generation for low TTFB
+// Force static generation for low TTFB
 export const dynamic = "force-static"
 
 export default function Page() {
@@ -54,8 +54,7 @@ export default function Page() {
     "@type": "WebPage",
     "@id": "https://jlmestk.com/",
     name: "JLM ESTK Club | Student Leadership & Project Community",
-    description:
-      "A student community focused on leadership, creativity, and personal growth. Learn, collaborate, build projects, and make a positive impact.",
+    description: "A student community focused on leadership, creativity, and personal growth. Learn, collaborate, build projects, and make a positive impact.",
     url: "https://jlmestk.com/",
     mainEntity: {
       "@type": "Organization",
@@ -65,15 +64,15 @@ export default function Page() {
   }
 
   return (
-    <>
-      <main className="min-h-[100dvh] text-white">
-        <SiteHeader />
+    <div className="min-h-screen bg-[#0A0E17]">
+      <SiteHeader />
+      <main className="text-white">
         <Hero />
         <Features />
         <LogoMarquee />
         <Pricing />
-        <AppverseFooter />
       </main>
+      <AppverseFooter />
 
       {/* JSON-LD structured data */}
       <Script
@@ -93,6 +92,6 @@ export default function Page() {
           __html: JSON.stringify(pageStructuredData),
         }}
       />
-    </>
+    </div>
   )
 }

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
-import Plasma from "@/components/plasma"
 import { X } from "lucide-react"
 import { supabaseBrowser } from "@/lib/supabase/client"
 
@@ -87,45 +86,55 @@ export default function JoinCellPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const supabase = supabaseBrowser()
-    let table = ""
-
-    switch (selectedCell) {
-      case "CELLULE DE PROJET":
-        table = "cellule_projet"
-        break
-      case "CELLULE DE MEDIA ET DESIGN":
-        table = "cellule_media"
-        break
-      case "CELLULE DE LOGISTIQUE":
-        table = "cellule_logistique"
-        break
-      case "CELLULE JLM JUNIOR":
-        table = "cellule_junior"
-        break
-    }
-
-    const { error } = await supabase.from(table).insert({
-      full_name: formData.fullName,
-      phone_number: formData.phoneNumber,
-    })
-
-    if (error) {
-      console.error(error)
-      alert("Erreur lors de l’envoi")
+    if (!selectedCell) {
+      alert("Veuillez sélectionner une cellule valide")
       return
     }
 
-    alert("Demande envoyée !")
-    setIsModalOpen(false)
-    setFormData({ fullName: "", phoneNumber: "" })
+    const supabase = supabaseBrowser()
 
-    // refresh counts immediately
-    loadCellCounts()
+    // Map cell names to table names
+    const cellToTableMap: { [key: string]: string } = {
+      "CELLULE DE PROJET": "cellule_projet",
+      "CELLULE DE MEDIA ET DESIGN": "cellule_media",
+      "CELLULE DE LOGISTIQUE": "cellule_logistique",
+      "CELLULE JLM JUNIOR": "cellule_junior"
+    }
+
+    const table = cellToTableMap[selectedCell]
+
+    if (!table) {
+      console.error("Table not found for selected cell:", selectedCell)
+      alert("Erreur: Cellule non valide")
+      return
+    }
+
+    try {
+      const { error } = await supabase.from(table).insert({
+        full_name: formData.fullName,
+        phone_number: formData.phoneNumber,
+      })
+
+      if (error) {
+        console.error(error)
+        alert("Erreur lors de l'envoi")
+        return
+      }
+
+      alert("Demande envoyée !")
+      setIsModalOpen(false)
+      setFormData({ fullName: "", phoneNumber: "" })
+
+      // refresh counts immediately
+      loadCellCounts()
+    } catch (error) {
+      console.error("Error submitting form:", error)
+      alert("Une erreur est survenue lors de l'envoi du formulaire")
+    }
   }
 
   return (
-    <div className="relative w-full min-h-screen overflow-hidden">
+    <div className="relative w-full min-h-screen overflow-hidden bg-[#0A0414]">
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -193,19 +202,7 @@ export default function JoinCellPage() {
         </div>
       )}
 
-      {/* Plasma Background */}
-      <div className="fixed inset-0 z-0 bg-black">
-        <Plasma
-          color="#8b5cf6"
-          speed={0.8}
-          direction="forward"
-          scale={1.5}
-          opacity={0.4}
-          mouseInteractive={true}
-        />
-      </div>
-
-      <div className="relative z-10 min-h-screen py-12 px-4">
+      <div className="relative min-h-screen py-12 px-4">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-bold text-white">
             Rejoignez une <span className="text-lime-300">Cellule</span>
@@ -215,7 +212,7 @@ export default function JoinCellPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {cellData.map((cell, index) => {
             const isFull =
               (cell.title === "CELLULE DE PROJET" && cellCounts.projet >= 20) ||

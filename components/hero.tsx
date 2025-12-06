@@ -7,11 +7,11 @@ import { useState, useCallback } from "react"
 
 const phoneData = [
   {
-    title: "Team Leader (Président)",
+    title: "Team Leader",
     sub: "Aya moumen",
-    role: "Leads the club, sets the vision, coordinates all teams, and represents the association officially.",
-    gradient: "from-[#0f172a] via-[#14532d] to-[#052e16]",
-    imageSrc: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202025-11-19%20at%2021.58.55_ecb97ad4-7sjq7GHdMml1h2HKBL23lLcNe3ap2O.jpg",
+    role: "coordinates and guides a team to achieve shared objectives. They organize tasks, support team members, ensure clear communication, and monitor progress while maintaining motivation and accountability.",
+    gradient: "from-[#0f172a] via-[#1e3a8a] to-[#172554]",
+    imageSrc: "/images/team/WhatsApp Image 2025-12-06 at 15.35.14_62bbc458.jpg",
   },
   {
     title: "Vice Team Leader",
@@ -83,15 +83,16 @@ const phoneData = [
     gradient: "from-[#1e1b4b] via-[#3730a3] to-[#1e1b4b]",
     imageSrc: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202025-11-19%20at%2021.58.54_93407ad9-GlqXGAQwk4vIwedRERivRndqul3HNO.jpg",
   },
+  {
+    title: "Designer",
+    sub: "Oussama boutaounte",
+    role: "creates clear and effective visual solutions by turning ideas and goals into simple, functional, and aesthetically balanced designs",
+    gradient: "from-[#0f172a] via-[#6b21a8] to-[#1e1b4b]",
+    imageSrc: "/images/team/WhatsApp Image 2025-11-19 at 20.40.02_8b57acfe.jpg"
+  },
 ]
 
 export function Hero() {
-  const buttonNew = (
-    <Button disabled className="rounded-full bg-lime-400 px-6 text-black hover:bg-lime-400 cursor-default">
-      Scroll
-    </Button>
-  )
-
   return (
     <section className="relative isolate overflow-hidden">
       <div className="container mx-auto px-4">
@@ -105,7 +106,6 @@ export function Hero() {
             <span className="block text-lime-300 drop-shadow-[0_0_20px_rgba(132,204,22,0.35)]">PROJECTS & LEADERSHIP</span>
             <span className="block">FOR STUDENTS</span>
           </h1>
-          <div className="mt-6">{buttonNew}</div>
 
           <div className="mt-10 flex w-full flex-col items-center gap-4">
             {phoneData.map((p, i) => {
@@ -137,25 +137,39 @@ function PhoneCard({
   videoSrc?: string
   imageSrc?: string
 }) {
-  const [imgSrc, setImgSrc] = useState(imageSrc)
+  const [imgSrc, setImgSrc] = useState<string | undefined>(imageSrc)
+  const [isImageLoaded, setIsImageLoaded] = useState(false)
+  const isLocalImage = imgSrc?.startsWith('/')
   
   const handleImageError = useCallback(() => {
+    console.warn(`Failed to load image: ${imgSrc}`)
     setImgSrc("/placeholder.svg")
+  }, [imgSrc])
+
+  const handleImageLoad = useCallback(() => {
+    setIsImageLoaded(true)
   }, [])
   
   return (
-    <div className="relative rounded-[28px] glass-border bg-neutral-900 p-2">
-      <div className="relative aspect-[9/19] w-full overflow-hidden rounded-2xl bg-black">
+    <div className="relative rounded-[28px] glass-border bg-neutral-900 p-2" aria-label={`${title} - ${sub}`}>
+      <div className="relative aspect-[9/19] w-full overflow-hidden rounded-2xl bg-black/50">
         {imgSrc || imageSrc ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-black">
+          <div className={`absolute inset-0 flex items-center justify-center bg-black transition-opacity duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}>
             <Image
               src={imgSrc || imageSrc || "/placeholder.svg"}
-              alt={title}
+              alt={`${title} - ${sub}`}
               width={300}
               height={600}
+              sizes="(max-width: 768px) 90vw, (max-width: 1200px) 45vw, 30vw"
               className="h-auto w-auto max-w-full max-h-full object-contain"
               priority={false}
+              loading="lazy"
+              decoding="async"
+              fetchPriority="low"
+              quality={85}
               onError={handleImageError}
+              onLoad={handleImageLoad}
+              unoptimized={!isLocalImage} // Only optimize local images
             />
           </div>
         ) : videoSrc ? (
@@ -169,22 +183,29 @@ function PhoneCard({
             aria-label={`${title} - ${sub}`}
           />
         ) : (
-          <div className="absolute inset-0 h-full w-full bg-black" />
+          <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-gray-900 to-black" />
+        )}
+
+        {/* Loading skeleton */}
+        {!isImageLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
+            <div className="h-8 w-8 animate-pulse rounded-full border-2 border-lime-400 border-t-transparent" />
+          </div>
         )}
 
         <div className="relative z-10 p-3">
           <div className="mx-auto mb-3 h-1.5 w-16 rounded-full bg-white/20" />
           <div className="space-y-1 px-1">
-            <div className="text-3xl font-bold leading-snug text-white/90">{title}</div>
-            <p className="text-sm font-medium text-lime-300">{sub}</p>
+            <h3 className="text-2xl font-bold leading-snug text-white/90 md:text-3xl">{title}</h3>
+            <p className="text-xs font-medium text-lime-300 sm:text-sm">{sub}</p>
           </div>
         </div>
       </div>
       
       {/* Role description below the phone */}
       {role && (
-        <div className="mt-3 p-3 bg-black/40 rounded-lg">
-          <p className="text-sm text-white/80 text-center">{role}</p>
+        <div className="mt-3 rounded-lg bg-black/40 p-3 backdrop-blur-sm">
+          <p className="text-xs text-white/80 sm:text-sm">{role}</p>
         </div>
       )}
     </div>

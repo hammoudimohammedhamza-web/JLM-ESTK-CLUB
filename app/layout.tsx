@@ -3,7 +3,6 @@ import "./globals.css"
 import type { Metadata } from "next"
 import { Inter } from 'next/font/google'
 import Script from "next/script"
-import Plasma from "@/components/plasma"
 import { Suspense } from "react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/react"
@@ -70,12 +69,9 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body>
+      <body className="bg-[#0A0E17]">
         <Suspense fallback={null}>
-          <div className="fixed inset-0 z-0 bg-black">
-            <Plasma color="#8b5cf6" speed={0.8} direction="forward" scale={1.5} opacity={0.4} mouseInteractive={true} />
-          </div>
-          <div className="relative z-10">{children}</div>
+          <div className="relative z-10 min-h-screen">{children}</div>
         </Suspense>
 
         {/* Vercel Speed Insights and Analytics components */}
